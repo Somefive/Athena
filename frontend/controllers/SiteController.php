@@ -157,7 +157,7 @@ class SiteController extends Controller
                 }
             }
         }
-
+        $this->layout = "main-login";
         return $this->render('signup', [
             'model' => $model,
         ]);
@@ -180,7 +180,7 @@ class SiteController extends Controller
                 Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for email provided.');
             }
         }
-
+        $this->layout = "main-login";
         return $this->render('requestPasswordResetToken', [
             'model' => $model,
         ]);
@@ -206,7 +206,7 @@ class SiteController extends Controller
 
             return $this->goHome();
         }
-
+        $this->layout = "main-login";
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
