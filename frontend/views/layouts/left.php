@@ -1,3 +1,8 @@
+<?php
+use common\models\User;
+/* @var User $user */
+$user = Yii::$app->user->identity;
+?>
 <aside class="main-sidebar">
 
     <section class="sidebar">
@@ -5,10 +10,10 @@
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="img/user/male.jpg" class="img-circle" alt="User Image"/>
+                <?=\yii\helpers\Html::img("@web/img/user/".$user->profile->gender.".jpg", ['class' => 'img-circle', 'alt' => 'User Image']);?>
             </div>
             <div class="pull-left info">
-                <p><?=Yii::$app->user->identity->username?></p>
+                <p><?=$user->username?></p>
                 <a href="#">
                     <?php if(Yii::$app->user->can('Verified')): ?>
                         <i class="fa fa-circle text-success"></i> Verified

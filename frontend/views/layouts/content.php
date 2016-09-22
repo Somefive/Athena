@@ -1,6 +1,10 @@
 <?php
 use yii\widgets\Breadcrumbs;
 use dmstr\widgets\Alert;
+use common\models\User;
+
+/* @var User $user */
+$user = Yii::$app->user->identity;
 
 ?>
 <div class="content-wrapper">

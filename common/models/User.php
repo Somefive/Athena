@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\models\base\Profile;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -20,6 +21,7 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property Profile $profile
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -185,5 +187,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    private $_profile = null;
+    public function getProfile()
+    {
+        if($this->_profile == null)
+            $this->_profile = Profile::findById($this->id);
+        return $this->_profile;
     }
 }

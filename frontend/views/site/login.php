@@ -62,7 +62,7 @@ $fieldOptions2 = [
 <!--        </div>-->
         <!-- /.social-auth-links -->
 
-        <a href="#">I forgot my password</a><br>
+        <a href="/site/request-password-reset">I forgot my password</a><br>
         <a href="/site/signup" class="text-center">Register a new membership</a>
 
     </div>

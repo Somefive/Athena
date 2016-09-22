@@ -1,5 +1,9 @@
 <?php
 use yii\helpers\Html;
+use common\models\User;
+
+/* @var User $user */
+$user = Yii::$app->user->identity;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -229,18 +233,16 @@ use yii\helpers\Html;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
-                        <span class="hidden-xs">Alexander Pierce</span>
+                        <?=\yii\helpers\Html::img("@web/img/user/".$user->profile->gender.".jpg", ['class' => 'user-image', 'alt' => 'User Image']);?>
+                        <span class="hidden-xs"><?=$user->username?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
-                                 alt="User Image"/>
-
+                            <?=\yii\helpers\Html::img("@web/img/user/".$user->profile->gender.".jpg", ['class' => 'img-circle', 'alt' => 'User Image']);?>
                             <p>
-                                Alexander Pierce - Web Developer
-                                <small>Member since Nov. 2012</small>
+                                <?=$user->profile->full_name?> - <?=$user->profile->nickname?>
+                                <small><?=$user->profile->school_id?></small>
                             </p>
                         </li>
                         <!-- Menu Body -->
