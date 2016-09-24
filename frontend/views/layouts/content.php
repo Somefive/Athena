@@ -5,8 +5,12 @@ use common\models\User;
 
 /* @var User $user */
 $user = Yii::$app->user->identity;
-
 ?>
+<style>
+    .content-wrapper{
+        padding: 10px;
+    }
+</style>
 <div class="content-wrapper">
     <section class="content-header">
         <?php if (isset($this->blocks['content-header'])) { ?>

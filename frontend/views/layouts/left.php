@@ -42,7 +42,7 @@ $user = Yii::$app->user->identity;
                 'items' => [
                     ['label' => 'Home', 'options' => ['class' => 'header']],
                     ['label' => 'Dashboard', 'icon' => 'fa fa-tachometer', 'url' => ['']],
-                    ['label' => 'Profile', 'icon' => 'fa fa-user', 'url' => ['']],
+                    ['label' => 'Profile', 'icon' => 'fa fa-user', 'url' => ['/site/profile']],
                     ['label' => 'Students', 'icon' => 'fa fa-users', 'url' => [''], 'visible' => Yii::$app->user->can('Teacher')],
                     ['label' => 'Course', 'options' => ['class' => 'header']],
                     ['label' => 'Materials', 'icon' => 'fa fa-file-text', 'url' => ['']],

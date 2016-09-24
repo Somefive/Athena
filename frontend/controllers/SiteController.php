@@ -1,8 +1,10 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\base\Profile;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\helpers\Console;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -34,7 +36,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index', 'profile'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -208,6 +210,19 @@ class SiteController extends Controller
         }
         $this->layout = "main-login";
         return $this->render('resetPassword', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionProfile()
+    {
+        /* @var $model Profile */
+        $model = Yii::$app->user->identity->profile;
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->save()?Yii::$app->session->setFlash('success','Profile update succeeds.'):Yii::$app->session->setFlash('error','Something wrong happened with database. Please wait for a minute and retry or contact the admin.');
+        }
+
+        return $this->render('profile',[
             'model' => $model,
         ]);
     }

@@ -31,6 +31,7 @@ class Profile extends ActiveRecord {
     public function rules()
     {
         return [
+            [['school_id','first_name','last_name','nickname','gender','department','class','contact'], 'safe'],
             ['gender', 'default', 'value' => self::GENDER_MALE],
             ['gender', 'in', 'range' => [self::GENDER_MALE, self::GENDER_FEMALE]],
         ];

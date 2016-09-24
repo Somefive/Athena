@@ -14,7 +14,7 @@ class m160922_102718_create_profile_table extends Migration
     {
         $this->createTable('profile', [
             'id' => $this->primaryKey(),
-            'school_id' => $this->string()->unique(),
+            'school_id' => $this->string(),
             'first_name' => $this->string(),
             'last_name' => $this->string(),
             'nickname' => $this->string(),
