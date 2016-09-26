@@ -56,4 +56,14 @@ class Profile extends ActiveRecord {
     {
         return $this->last_name.' '.$this->first_name;
     }
+
+    public function getCourses()
+    {
+        return $this->hasMany(Course::className(),['id'=>'course_id'])->viaTable('course_participants',['user_id'=>'id']);
+    }
+
+    public function getParticipants()
+    {
+        return $this->hasMany(CourseParticipants::className(),['user_id'=>'id']);
+    }
 }

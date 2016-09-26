@@ -41,7 +41,11 @@ $user = Yii::$app->user->identity;
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
                     ['label' => 'Home', 'options' => ['class' => 'header']],
-                    ['label' => 'Dashboard', 'icon' => 'fa fa-tachometer', 'url' => ['']],
+                    ['label' => 'Dashboard', 'icon' => 'fa fa-tachometer', 'url' => ['/dashboard/']],
+                    ['label' => 'Course', 'icon' => 'fa fa-book', 'url' => '#', 'items' => [
+                        ['label' => 'Course List', 'icon' => 'fa fa-circle-o', 'url' => '/course/course-list',],
+                        ['label' => 'My Courses', 'icon' => 'fa fa-circle-o', 'url' => '/course/my-courses',],
+                    ]],
                     ['label' => 'Profile', 'icon' => 'fa fa-user', 'url' => ['/site/profile']],
                     ['label' => 'Students', 'icon' => 'fa fa-users', 'url' => [''], 'visible' => Yii::$app->user->can('Teacher')],
                     ['label' => 'Course', 'options' => ['class' => 'header']],
