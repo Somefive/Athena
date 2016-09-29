@@ -1,10 +1,15 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\base\Message;
 use common\models\base\Profile;
+use common\models\User;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\helpers\Console;
+use yii\rbac\Role;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -36,9 +41,19 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index', 'profile'],
+                        'actions' => ['logout', 'index', 'profile','validate'],
                         'allow' => true,
                         'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['students'],
+                        'allow' => true,
+                        'roles' => ['Teacher'],
+                    ],
+                    [
+                        'actions' => ['chat-to'],
+                        'allow' => true,
+                        'roles' => ['Teacher','Student'],
                     ],
                 ],
             ],
@@ -217,7 +232,9 @@ class SiteController extends Controller
     public function actionProfile()
     {
         /* @var $model Profile */
-        $model = Yii::$app->user->identity->profile;
+        /* @var $user User */
+        $user = Yii::$app->user->identity;
+        $model = $user->profile;
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->save()?Yii::$app->session->setFlash('success','Profile update succeeds.'):Yii::$app->session->setFlash('error','Something wrong happened with database. Please wait for a minute and retry or contact the admin.');
         }
@@ -226,4 +243,121 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+    public function actionValidate()
+    {
+        if(Yii::$app->user->can("Teacher"))
+        {
+            $orimsg = Message::findOne(Yii::$app->request->get('id'));
+            $op = Yii::$app->request->get('type');
+            if(!empty($orimsg)){
+                $responseMsg = new Message([
+                    'from' => Yii::$app->user->id,
+                    'to' => $orimsg->from,
+                    'type' => Message::TYPE_PLAIN_TEXT,
+                ]);
+                if ($op == 'agree') {
+                    $responseMsg->content = "Your validation request has been accepted.";
+                    Yii::$app->authManager->assign(Yii::$app->authManager->createRole('Student'),$orimsg->from);
+                    $orimsg->delete();
+                    $responseMsg->save();
+                } else if ($op == 'disagree') {
+                    $responseMsg->content = "Your validation request has been rejected.";
+                    $orimsg->delete();
+                    $responseMsg->save();
+                }
+                Yii::$app->session->setFlash('success','Response sent.');
+            }
+
+            $requests = Message::findAll(['type'=>Message::TYPE_VALIDATION_REQUEST]);
+            $data = [];
+            foreach($requests as $request){
+                $profile = Profile::findOne($request->from);
+                if(empty($profile)) continue;
+                array_push($data,[
+                    'message_id' => $request->id,
+                    'created_at' => $request->created_at,
+                    'school_id' => $profile->school_id,
+                    'name' => $profile->full_name,
+                    'gender' => $profile->gender,
+                    'department' => $profile->department,
+                    'class' => $profile->class,
+                    'contact' => $profile->contact,
+                ]);
+            }
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $data,
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+                'sort' => [
+                    'attributes' => ['created_at', 'school_id'],
+                ],
+            ]);
+            return $this->render('validate',[
+                'dataProvider' => $dataProvider
+            ]);
+        }
+        else if(Yii::$app->user->can("Student"))
+        {
+            Yii::$app->session->setFlash('primary','You have already been validated.');
+            return $this->goBack();
+        }
+        else
+        {
+            if(Message::findOne(['from'=>Yii::$app->user->id,'type'=>Message::TYPE_VALIDATION_REQUEST]))
+                Yii::$app->session->setFlash('success','Your request has already been sent. Please wait.');
+            else {
+                $msg = new Message();
+                $msg->from = Yii::$app->user->id;
+                $msg->to = 0;
+                $msg->type = Message::TYPE_VALIDATION_REQUEST;
+                $msg->save()?Yii::$app->session->setFlash('success','Your request has already been sent successfully! Please wait.'):Yii::$app->session->setFlash('error','Oops. Sorry, something wrong happened.');
+            }
+            return $this->goBack();
+        }
+    }
+
+    public function actionStudents()
+    {
+        Yii::$app->user->setReturnUrl('/site/students');
+        $profiles = Profile::find()->all();
+        $data = [];
+        foreach($profiles as $profile) {
+            /* @var $profile Profile */
+            if(Yii::$app->authManager->checkAccess($profile->id,'Student'))
+                array_push($data,[
+                    'user_id' => $profile->id,
+                    'school_id' => $profile->school_id,
+                    'name' => $profile->full_name,
+                    'nickname' => $profile->nickname,
+                    'gender' => $profile->gender,
+                    'department' => $profile->department,
+                    'class' => $profile->class,
+                    'contact' => $profile->contact
+                ]);
+        }
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $data,
+            'pagination' => [
+                'pageSize' => 30,
+            ],
+            'sort' => [
+                'attributes' => ['school_id', 'department', 'name'],
+            ],
+        ]);
+        return $this->render('students',[
+            'dataProvider' => $dataProvider,
+            'message' => new Message(),
+        ]);
+    }
+
+    public function actionChatTo()
+    {
+        $msg = new Message();
+        if($msg->load(Yii::$app->request->post()) && ($msg->from=Yii::$app->user->id) && $msg->validate())
+            $msg->save()?Yii::$app->session->setFlash('success','message sent.'):Yii::$app->session->setFlash('error','message failed');
+        return $this->goBack();
+    }
+
 }

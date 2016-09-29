@@ -14,7 +14,7 @@ $user = Yii::$app->user->identity;
             </div>
             <div class="pull-left info">
                 <p><?=$user->username?></p>
-                <a href="#">
+                <a href="/site/validate">
                     <?php if(Yii::$app->user->can('Verified')): ?>
                         <i class="fa fa-circle text-success"></i> Verified
                     <?php else: ?>
@@ -47,7 +47,7 @@ $user = Yii::$app->user->identity;
                         ['label' => 'My Courses', 'icon' => 'fa fa-circle-o', 'url' => '/course/my-courses',],
                     ]],
                     ['label' => 'Profile', 'icon' => 'fa fa-user', 'url' => ['/site/profile']],
-                    ['label' => 'Students', 'icon' => 'fa fa-users', 'url' => [''], 'visible' => Yii::$app->user->can('Teacher')],
+                    ['label' => 'Students', 'icon' => 'fa fa-users', 'url' => ['/site/students'], 'visible' => Yii::$app->user->can('Teacher')],
                     ['label' => 'Course', 'options' => ['class' => 'header']],
                     ['label' => 'Materials', 'icon' => 'fa fa-file-text', 'url' => ['']],
                     ['label' => 'Compose', 'icon' => 'fa fa-pencil-square-o', 'url' => ['']],
